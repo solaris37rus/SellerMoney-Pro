@@ -1,0 +1,12 @@
+{
+  "name": "SellerMoney Pro",
+  "short_name": "SellerMoney",
+  "description": "Калькулятор чистой прибыли, маржи, ROI и точки безубыточности для селлеров маркетплейсов.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070910",
+  "theme_color": "#ff5a00",
+  "icons": [
+    {"src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml"}
+  ]
+}

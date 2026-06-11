@@ -1,0 +1,2 @@
+-- Optional demo rows can be added after creating a test user.
+-- The frontend also includes local demo data, so this file is intentionally light.

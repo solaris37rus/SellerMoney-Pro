@@ -1,0 +1,13 @@
+{
+  "name": "sellermoney-pro-commercial",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Commercial-ready SellerMoney Pro: marketplace profit calculator, Supabase, Cloudflare Pages Functions, YooMoney/YooKassa, Telegram bot.",
+  "scripts": {
+    "dev": "wrangler pages dev . --compatibility-date=2026-06-11",
+    "deploy": "wrangler pages deploy . --project-name=sellermoney-pro"
+  },
+  "devDependencies": {
+    "wrangler": "latest"
+  }
+}

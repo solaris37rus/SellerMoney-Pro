@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SellerMoney Pro — калькулятор чистой прибыли WB/Ozon/Я.Маркет</title>
+  <meta name="description" content="Премиальный калькулятор прибыли для селлеров маркетплейсов: чистая прибыль, маржа, ROI, точка безубыточности, сценарии скидок и реклама." />
+  <meta property="og:title" content="SellerMoney Pro — считай чистую прибыль, а не выручку" />
+  <meta property="og:description" content="Проверь товар перед закупкой и не уходи в минус на WB, Ozon и Яндекс Маркете." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script>
+    window.SELLERMONEY_CONFIG = {
+      brand: 'SellerMoney Pro',
+      supportEmail: 'slava.plekhanov.2002@gmail.com',
+      supportVk: 'https://vk.com/bread1996',
+      telegramBot: 'SellerMoney_Pro_bot',
+      telegramUrl: 'https://t.me/SellerMoney_Pro_bot',
+      supabaseUrl: '',
+      supabaseAnonKey: '',
+      publicBaseUrl: ''
+    };
+  </script>
+  <script src="/config.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="SellerMoney Pro">
+      <img src="/assets/logo.svg" alt="SellerMoney Pro" />
+    </a>
+    <nav class="nav">
+      <a href="#calculator">Калькулятор</a>
+      <a href="#dashboard">Кабинет</a>
+      <a href="#pricing">Тарифы</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="top-actions">
+      <button class="ghost-btn" id="openAuthBtn">Войти</button>
+      <a class="primary-btn small" href="#calculator">Посчитать прибыль</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero section-grid">
+      <div class="hero-copy">
+        <div class="badge">profit engine · WB · Ozon · Я.Маркет</div>
+        <h1>Считай не выручку. <span>Считай чистую прибыль.</span></h1>
+        <p class="lead">SellerMoney Pro показывает, какие товары реально зарабатывают, где начинается минус и сколько можно тратить на рекламу до точки безубыточности.</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#calculator">Рассчитать товар бесплатно</a>
+          <button class="ghost-btn" id="demoFillBtn">Заполнить демо</button>
+        </div>
+        <div class="trust-row">
+          <div><strong>3 мин</strong><span>до первого расчёта</span></div>
+          <div><strong>0 ₽</strong><span>старт без карты</span></div>
+          <div><strong>Pro</strong><span>портфель товаров</span></div>
+        </div>
+      </div>
+      <div class="hero-panel card-glow">
+        <div class="terminal-head"><span></span><span></span><span></span><b>LIVE PROFIT CHECK</b></div>
+        <div class="profit-card status-good">
+          <span>Футболка oversize</span>
+          <strong>+327 ₽</strong>
+          <em>маржа 21.9% · ROI 62.8%</em>
+        </div>
+        <div class="profit-card status-warn">
+          <span>Чехол iPhone</span>
+          <strong>+12 ₽</strong>
+          <em>товар почти в нуле</em>
+        </div>
+        <div class="profit-card status-bad">
+          <span>Наушники wireless</span>
+          <strong>-74 ₽</strong>
+          <em>реклама выше 6% убивает товар</em>
+        </div>
+        <div class="radar">
+          <div class="radar-line"></div>
+          <p>AI-рекомендация: подними цену до 1 080 ₽ или отключи участие в акции.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pain section">
+      <div class="section-title">
+        <span class="eyebrow">боль селлера</span>
+        <h2>Маркетплейс показывает оборот. Мы показываем деньги, которые остаются.</h2>
+      </div>
+      <div class="pain-grid">
+        <article><b>Комиссии</b><p>WB/Ozon/Я.Маркет, эквайринг, хранение и логистика съедают маржу быстрее, чем кажется.</p></article>
+        <article><b>Скидки</b><p>Акции дают продажи, но часто уводят SKU ниже точки безубыточности.</p></article>
+        <article><b>Реклама</b><p>ДРР 12–18% может выглядеть нормально, пока не посчитаешь чистую прибыль.</p></article>
+        <article><b>Возвраты</b><p>Чем выше возвратная логистика, тем опаснее низкая цена и дешёвые товары.</p></article>
+      </div>
+    </section>
+
+    <section class="calculator-section section" id="calculator">
+      <div class="section-title compact">
+        <span class="eyebrow">бесплатный расчёт</span>
+        <h2>Калькулятор чистой прибыли</h2>
+        <p>Введите данные товара. Сервис покажет чистую прибыль, маржу, ROI, минимальную цену и опасные зоны.</p>
+      </div>
+
+      <div class="calc-layout">
+        <form class="calc-form glass" id="calcForm">
+          <div class="form-row full">
+            <label>Название товара
+              <input name="title" value="Футболка oversize" placeholder="Например: Футболка oversize" required />
+            </label>
+          </div>
+          <div class="form-row">
+            <label>Маркетплейс
+              <select name="marketplace" id="marketplaceSelect">
+                <option value="wildberries">Wildberries</option>
+                <option value="ozon">Ozon</option>
+                <option value="yandex">Яндекс Маркет</option>
+              </select>
+            </label>
+            <label>Категория
+              <select name="category" id="categorySelect">
+                <option value="clothes">Одежда</option>
+                <option value="electronics">Электроника</option>
+                <option value="beauty">Красота</option>
+                <option value="home">Дом</option>
+                <option value="custom">Своя категория</option>
+              </select>
+            </label>
+          </div>
+          <div class="form-row">
+            <label>Цена продажи, ₽<input name="price" type="number" min="1" step="1" value="1490" required /></label>
+            <label>Себестоимость, ₽<input name="cost" type="number" min="0" step="1" value="520" required /></label>
+          </div>
+          <div class="form-row">
+            <label>Упаковка, ₽<input name="packaging" type="number" min="0" step="1" value="35" /></label>
+            <label>Логистика, ₽<input name="logistics" type="number" min="0" step="1" value="110" /></label>
+          </div>
+          <div class="form-row">
+            <label>Хранение/прочее, ₽<input name="storage" type="number" min="0" step="1" value="18" /></label>
+            <label>Возвратная логистика, ₽<input name="returnLogistics" type="number" min="0" step="1" value="90" /></label>
+          </div>
+          <div class="form-row three">
+            <label>Комиссия, %<input name="commission" type="number" min="0" max="80" step="0.1" value="18" /></label>
+            <label>Эквайринг, %<input name="acquiring" type="number" min="0" max="15" step="0.1" value="2" /></label>
+            <label>Реклама, %<input name="ads" type="number" min="0" max="80" step="0.1" value="10" /></label>
+          </div>
+          <div class="form-row three">
+            <label>Возвраты, %<input name="returns" type="number" min="0" max="90" step="0.1" value="7" /></label>
+            <label>Налог
+              <select name="taxMode">
+                <option value="usn6">УСН 6% с дохода</option>
+                <option value="usn15">УСН 15% с прибыли</option>
+                <option value="none">Не учитывать</option>
+              </select>
+            </label>
+            <label>Продаж/мес.<input name="salesPerMonth" type="number" min="0" step="1" value="350" /></label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="primary-btn">Рассчитать</button>
+            <button type="button" class="ghost-btn" id="saveProductBtn">Сохранить товар</button>
+            <button type="button" class="ghost-btn" id="resetCalcBtn">Сбросить</button>
+          </div>
+        </form>
+
+        <aside class="result-panel glass" id="resultPanel">
+          <div class="result-status" id="resultStatus">прибыльный</div>
+          <h3 id="resultTitle">Футболка oversize</h3>
+          <div class="big-profit" id="profitValue">+327 ₽</div>
+          <div class="metric-grid">
+            <div><span>Маржа</span><b id="marginValue">21.9%</b></div>
+            <div><span>ROI</span><b id="roiValue">62.8%</b></div>
+            <div><span>Точка безубыточности</span><b id="breakevenValue">1 163 ₽</b></div>
+            <div><span>Потенциал/мес.</span><b id="monthlyValue">114 450 ₽</b></div>
+          </div>
+          <div class="danger-zone">
+            <span>Безопасная реклама</span>
+            <div class="progress"><i id="adsBar"></i></div>
+            <b id="maxAdsValue">до 31.9%</b>
+          </div>
+          <div class="recommendation" id="recommendationBox">Цена нормальная. Но скидку ниже точки безубыточности ставить нельзя.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="scenario section">
+      <div class="section-title compact">
+        <span class="eyebrow">симулятор</span>
+        <h2>Что будет, если...</h2>
+      </div>
+      <div class="scenario-box glass">
+        <label>Новая цена, ₽<input id="scenarioPrice" type="number" value="1290" /></label>
+        <label>Реклама, %<input id="scenarioAds" type="number" value="15" /></label>
+        <label>Возвраты, %<input id="scenarioReturns" type="number" value="12" /></label>
+        <button class="primary-btn" id="scenarioBtn">Проверить сценарий</button>
+        <div class="scenario-output" id="scenarioOutput">Запустите сценарий, чтобы увидеть риск акции или роста рекламы.</div>
+      </div>
+    </section>
+
+    <section class="dashboard-section section" id="dashboard">
+      <div class="section-title compact">
+        <span class="eyebrow">кабинет</span>
+        <h2>Портфель товаров</h2>
+        <p>После подключения Supabase товары сохраняются в базе пользователя. До подключения работает локальный демо-режим.</p>
+      </div>
+      <div class="dashboard-grid">
+        <div class="stat-card"><span>Товаров</span><b id="statTotal">0</b></div>
+        <div class="stat-card good"><span>Прибыльных</span><b id="statGood">0</b></div>
+        <div class="stat-card warn"><span>На грани</span><b id="statWarn">0</b></div>
+        <div class="stat-card bad"><span>В минусе</span><b id="statBad">0</b></div>
+      </div>
+      <div class="table-toolbar glass">
+        <input id="productSearch" placeholder="Поиск по товарам" />
+        <select id="productFilter">
+          <option value="all">Все товары</option>
+          <option value="good">Прибыльные</option>
+          <option value="warn">На грани</option>
+          <option value="bad">Убыточные</option>
+        </select>
+        <button class="ghost-btn" id="importBtn">Импорт CSV</button>
+        <button class="ghost-btn" id="exportBtn">Экспорт CSV</button>
+        <input type="file" id="csvFile" accept=".csv" hidden />
+      </div>
+      <div class="product-table glass" id="productTable"></div>
+    </section>
+
+    <section class="pricing-section section" id="pricing">
+      <div class="section-title compact">
+        <span class="eyebrow">монетизация</span>
+        <h2>Тарифы, которые легко купить</h2>
+        <p>Первый чек должен быть низким, а ценность — денежной. Поэтому лимитируем не расчёт, а сохранение и анализ портфеля.</p>
+      </div>
+      <div class="pricing-grid">
+        <article class="price-card">
+          <h3>Free</h3><div class="price">0 ₽</div><p>Проверить идею и посчитать первые товары.</p>
+          <ul><li>3 товара</li><li>ручной расчёт</li><li>точка безубыточности</li></ul>
+          <button class="ghost-btn" data-plan="free">Начать бесплатно</button>
+        </article>
+        <article class="price-card hot">
+          <div class="hot-label">лучший старт</div>
+          <h3>Start</h3><div class="price">790 ₽<small>/мес</small></div><p>Для новичка или маленького магазина.</p>
+          <ul><li>до 25 товаров</li><li>сценарии скидок</li><li>экспорт CSV</li><li>поддержка в Telegram</li></ul>
+          <button class="primary-btn" data-plan="start">Подключить Start</button>
+        </article>
+        <article class="price-card pro">
+          <h3>Pro</h3><div class="price">1 490 ₽<small>/мес</small></div><p>Основной тариф для селлера, который считает деньги.</p>
+          <ul><li>до 300 товаров</li><li>импорт CSV</li><li>анализ портфеля</li><li>рекомендации по рискам</li></ul>
+          <button class="primary-btn" data-plan="pro">Подключить Pro</button>
+        </article>
+        <article class="price-card">
+          <h3>Business</h3><div class="price">3 990 ₽<small>/мес</small></div><p>Для команды и нескольких магазинов.</p>
+          <ul><li>безлимит товаров</li><li>несколько кабинетов</li><li>приоритетная поддержка</li><li>отчёт для закупки</li></ul>
+          <button class="ghost-btn" data-plan="business">Подключить Business</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact-strip section">
+      <div>
+        <span class="eyebrow">поддержка</span>
+        <h2>Нужен быстрый разбор товара?</h2>
+        <p>Пишите в Telegram-бот или VK. На старте можно продавать ручной аудит 10 товаров за 990 ₽ и переводить в подписку.</p>
+      </div>
+      <div class="contact-actions">
+        <a class="primary-btn" href="https://t.me/SellerMoney_Pro_bot" target="_blank" rel="noreferrer">Открыть Telegram-бота</a>
+        <a class="ghost-btn" href="https://vk.com/bread1996" target="_blank" rel="noreferrer">VK</a>
+        <a class="ghost-btn" href="mailto:slava.plekhanov.2002@gmail.com">Email</a>
+      </div>
+    </section>
+
+    <section class="faq section" id="faq">
+      <div class="section-title compact">
+        <span class="eyebrow">FAQ</span>
+        <h2>Частые вопросы</h2>
+      </div>
+      <details open><summary>Это замена аналитике маркетплейса?</summary><p>Нет. Это быстрый финансовый слой: вы вводите ключевые расходы и видите чистую прибыль, риски и точку безубыточности.</p></details>
+      <details><summary>Нужна ли интеграция с WB/Ozon?</summary><p>Для первой коммерческой версии нет. Ручной ввод и CSV-импорт позволяют запустить продажи быстрее. API-интеграции можно добавить после первых оплат.</p></details>
+      <details><summary>Как подключаются оплаты?</summary><p>Код поддерживает YooMoney-форму, YooMoney webhook и опционально ЮKassa API. Секреты добавляются в Cloudflare Pages Variables.</p></details>
+      <details><summary>Почему Supabase?</summary><p>Он даёт Postgres, Auth, RLS-политики и быстрый запуск без собственного сервера.</p></details>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <img src="/assets/logo.svg" alt="SellerMoney Pro" />
+    <div>
+      <a href="/legal/privacy.html">Политика конфиденциальности</a>
+      <a href="/legal/terms.html">Пользовательское соглашение</a>
+      <a href="/admin.html">Админка</a>
+    </div>
+    <p>© <span id="year"></span> SellerMoney Pro. Демо-расчёты не являются финансовой консультацией.</p>
+  </footer>
+
+  <dialog class="auth-modal" id="authModal">
+    <button class="close" id="closeAuthBtn">×</button>
+    <div class="modal-logo"><img src="/assets/logo.svg" alt="SellerMoney Pro" /></div>
+    <h2>Вход в кабинет</h2>
+    <p>Подключите Supabase — и форма начнёт создавать реальные аккаунты. До этого работает демо-режим.</p>
+    <form id="authForm" class="auth-form">
+      <input name="email" type="email" placeholder="Email" required value="" />
+      <input name="password" type="password" placeholder="Пароль" minlength="6" required />
+      <div class="auth-actions">
+        <button type="submit" class="primary-btn" data-auth="signin">Войти</button>
+        <button type="button" class="ghost-btn" id="signupBtn">Создать аккаунт</button>
+      </div>
+      <button type="button" class="link-btn" id="magicBtn">Войти по email-ссылке</button>
+      <button type="button" class="link-btn" id="telegramLinkBtn">Привязать Telegram через бота</button>
+    </form>
+    <div class="auth-note" id="authNote"></div>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+</body>
+</html>
