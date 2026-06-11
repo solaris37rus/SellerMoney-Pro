@@ -1,4 +1,23 @@
-const CONFIG = Object.assign({ supportEmail: 'slava.plekhanov.2002@gmail.com', supportVk: 'https://vk.com/bread1996', telegramUrl: 'https://t.me/SellerMoney_Pro_bot', supabaseUrl: 'https://hulwoicinxwnighvexex.supabase.co', supabaseAnonKey: 'sb_publishable_nZ0iaxmDVPmglkrvNWxejA_FIiHi8Lp', publicBaseUrl: 'https://sellermoney-pro.pages.dev' }, window.SELLERMONEY_CONFIG || {});
+const DEFAULT_CONFIG = {
+  brand: 'SellerMoney Pro',
+  supportEmail: 'slava.plekhanov.2002@gmail.com',
+  supportVk: 'https://vk.com/bread1996',
+  telegramBot: 'SellerMoney_Pro_bot',
+  telegramUrl: 'https://t.me/SellerMoney_Pro_bot',
+  supabaseUrl: 'https://hulwoicinxwnighvexex.supabase.co',
+  supabaseAnonKey: 'sb_publishable_nZ0iaxmDVPmglkrvNWxejA_FIiHi8Lp',
+  publicBaseUrl: 'https://sellermoney-pro.pages.dev'
+};
+const RAW_CONFIG = window.SELLERMONEY_CONFIG || {};
+const CONFIG = { ...DEFAULT_CONFIG };
+Object.entries(RAW_CONFIG).forEach(([key, value]) => {
+  if (typeof value === 'string') {
+    if (value.trim() !== '') CONFIG[key] = value.trim();
+  } else if (value !== undefined && value !== null) {
+    CONFIG[key] = value;
+  }
+});
+window.SELLERMONEY_CONFIG = CONFIG;
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 const fmtRub = (n) => `${n >= 0 ? '+' : '-'}${Math.abs(Math.round(n)).toLocaleString('ru-RU')} ₽`;
@@ -294,8 +313,10 @@ async function createCheckout(plan) {
       method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({ plan, email })
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Ошибка оплаты');
+    const text = await res.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text || `Пустой ответ API (${res.status})` }; }
+    if (!res.ok) throw new Error(data.error || `Ошибка API: ${res.status}`);
     if (data.payment_url) location.href = data.payment_url;
     if (data.payment_form) submitPaymentForm(data.payment_form);
     if (data.manual_url) { toast('Открою Telegram для подтверждения оплаты.'); window.open(data.manual_url, '_blank'); }
@@ -375,8 +396,10 @@ async function linkTelegram() {
   try {
     const token = (await supabaseClient.auth.getSession()).data?.session?.access_token;
     const res = await fetch('/api/link-telegram', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Не удалось создать ссылку');
+    const text = await res.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch { data = { error: text || `Пустой ответ API (${res.status})` }; }
+    if (!res.ok) throw new Error(data.error || `Ошибка API: ${res.status}`);
     window.open(data.url, '_blank');
   } catch (e) { toast(e.message || 'Ошибка привязки Telegram'); }
 }

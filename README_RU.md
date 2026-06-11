@@ -1,3 +1,5 @@
+# SellerMoney Pro — complete production build
+
 # SellerMoney Pro — production package
 
 Готовая коммерческая сборка: лендинг, PWA-кабинет, Supabase Auth/DB, Cloudflare Pages Functions, Telegram-бот, YooMoney/YooKassa-ready backend.
@@ -49,3 +51,38 @@ python -m http.server 8080
 ```
 
 Откройте: `http://localhost:8080`
+
+
+## Финальная сборка 2026-06-12
+- Supabase-конфиг закреплён в `config.js`, `index.html` и безопасных defaults `app.js`.
+- Пустой старый `window.SELLERMONEY_CONFIG` больше не может перебить рабочие настройки.
+- Публичная витрина очищена от демо-товаров, технических подсказок и ссылки на админку.
+- Service Worker переведён в network-first для HTML/JS/CSS/config, чтобы Cloudflare обновлялся без старого кэша.
+
+
+## ВАЖНО ДЛЯ CLOUDFLARE DIRECT UPLOAD
+
+Эта сборка содержит `_worker.js`. Он нужен, потому что Direct Upload в панели Cloudflare не компилирует папку `functions`, а `_worker.js` поддерживается.
+
+После загрузки проверьте:
+
+```text
+https://sellermoney-pro.pages.dev/api/health
+```
+
+Правильный ответ:
+
+```json
+{"ok":true,"service":"SellerMoney Pro API","mode":"advanced-worker"}
+```
+
+Если `mode` не `advanced-worker`, значит загружена старая сборка или кэш.
+
+
+## Важно для Cloudflare Direct Upload
+
+Эта версия использует корневой `_worker.js`, чтобы API работал даже при ручной загрузке в Cloudflare Pages. Если `/api/health` не отвечает JSON, значит `_worker.js` не загружен в корень.
+
+## Telegram-регистрация
+
+Команда `/start` в боте автоматически создаёт или обновляет пользователя в таблице `telegram_users`.
