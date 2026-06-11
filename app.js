@@ -1,4 +1,4 @@
-const CONFIG = window.SELLERMONEY_CONFIG || {};
+const CONFIG = Object.assign({ supportEmail: 'slava.plekhanov.2002@gmail.com', supportVk: 'https://vk.com/bread1996', telegramUrl: 'https://t.me/SellerMoney_Pro_bot', supabaseUrl: 'https://hulwoicinxwnighvexex.supabase.co', supabaseAnonKey: 'sb_publishable_nZ0iaxmDVPmglkrvNWxejA_FIiHi8Lp', publicBaseUrl: 'https://sellermoney-pro.pages.dev' }, window.SELLERMONEY_CONFIG || {});
 const $ = (s, root = document) => root.querySelector(s);
 const $$ = (s, root = document) => Array.from(root.querySelectorAll(s));
 const fmtRub = (n) => `${n >= 0 ? '+' : '-'}${Math.abs(Math.round(n)).toLocaleString('ru-RU')} ₽`;
@@ -57,7 +57,7 @@ function valuesFromForm() {
   const fd = new FormData(form);
   const val = (name) => Number(String(fd.get(name) || '0').replace(',', '.')) || 0;
   return {
-    title: String(fd.get('title') || 'Товар').trim(),
+    title: String(fd.get('title') || 'Новый товар').trim(),
     marketplace: fd.get('marketplace'),
     category: fd.get('category'),
     price: val('price'), cost: val('cost'), packaging: val('packaging'), logistics: val('logistics'),
@@ -183,10 +183,9 @@ async function saveProduct() {
     if (error) return toast(`Ошибка сохранения: ${error.message}`);
     toast('Товар сохранён в базе Supabase');
   } else {
-    const local = JSON.parse(localStorage.getItem('SM_PRODUCTS') || '[]');
-    local.unshift({ id: crypto.randomUUID(), created_at: new Date().toISOString(), ...payload });
-    localStorage.setItem('SM_PRODUCTS', JSON.stringify(local));
-    toast('Товар сохранён локально. Подключите Supabase для продакшена.');
+    toast('Войдите в аккаунт, чтобы сохранить товар в кабинете.');
+    $('#authModal')?.showModal();
+    return;
   }
   await loadProducts();
 }
@@ -196,7 +195,7 @@ async function loadProducts() {
     const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
     if (!error) products = data || [];
   } else {
-    products = JSON.parse(localStorage.getItem('SM_PRODUCTS') || '[]');
+    products = [];
   }
   renderProducts();
 }
@@ -205,8 +204,8 @@ async function deleteProduct(id) {
   if (supabaseClient && currentUser) {
     await supabaseClient.from('products').delete().eq('id', id);
   } else {
-    products = products.filter(p => p.id !== id);
-    localStorage.setItem('SM_PRODUCTS', JSON.stringify(products));
+    toast('Войдите в аккаунт, чтобы управлять товарами.');
+    return;
   }
   await loadProducts();
 }
@@ -221,7 +220,7 @@ function renderProducts() {
   $('#statBad').textContent = products.filter(p => p.status === 'bad').length;
   const table = $('#productTable');
   if (!list.length) {
-    table.innerHTML = '<div class="product-row"><b>Пока нет товаров</b><span>Сохраните расчёт или импортируйте CSV</span></div>';
+    table.innerHTML = currentUser ? '<div class="product-row empty-row"><b>Портфель пуст</b><span>Сохраните первый расчёт или импортируйте CSV-файл.</span></div>' : '<div class="product-row empty-row"><b>Войдите в кабинет</b><span>После входа здесь появятся сохранённые товары и риск-статусы.</span></div>';
     return;
   }
   table.innerHTML = `<div class="product-head"><span>Товар</span><span>Маркет</span><span>Прибыль</span><span>Маржа</span><span>Безубыток</span><span></span></div>` + list.map(p => `
@@ -265,7 +264,7 @@ function marketName(m) { return m === 'wildberries' ? 'WB' : m === 'ozon' ? 'Ozo
 function escapeHtml(s) { return String(s).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch])); }
 
 async function signIn(email, password) {
-  if (!supabaseClient) return toast('Supabase не подключён. Вставьте URL и anon key в config.js или index.html.');
+  if (!supabaseClient) return toast('Сервис авторизации временно недоступен. Напишите в поддержку.');
   const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
   if (error) return toast(error.message);
   currentUser = data.user;
@@ -274,13 +273,13 @@ async function signIn(email, password) {
   await loadProducts();
 }
 async function signUp(email, password) {
-  if (!supabaseClient) return toast('Supabase не подключён. Сначала настройте проект по инструкции.');
+  if (!supabaseClient) return toast('Сервис авторизации временно недоступен. Напишите в поддержку.');
   const { error } = await supabaseClient.auth.signUp({ email, password });
   if (error) return toast(error.message);
   toast('Аккаунт создан. Проверьте email, если включено подтверждение.');
 }
 async function magicLink(email) {
-  if (!supabaseClient) return toast('Supabase не подключён.');
+  if (!supabaseClient) return toast('Сервис авторизации временно недоступен.');
   const { error } = await supabaseClient.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin } });
   toast(error ? error.message : 'Ссылка для входа отправлена на email');
 }
@@ -299,7 +298,7 @@ async function createCheckout(plan) {
     if (!res.ok) throw new Error(data.error || 'Ошибка оплаты');
     if (data.payment_url) location.href = data.payment_url;
     if (data.payment_form) submitPaymentForm(data.payment_form);
-    if (data.manual_url) { toast('Платёжка не настроена. Открою Telegram для ручной оплаты.'); window.open(data.manual_url, '_blank'); }
+    if (data.manual_url) { toast('Открою Telegram для подтверждения оплаты.'); window.open(data.manual_url, '_blank'); }
   } catch (e) { toast(e.message); }
 }
 function submitPaymentForm(form) {
@@ -328,27 +327,36 @@ function exportCsv() {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sellermoney-products.csv'; a.click();
 }
 function importCsv(file) {
+  if (!supabaseClient || !currentUser) {
+    toast('Войдите в аккаунт, чтобы импортировать товары.');
+    $('#authModal')?.showModal();
+    return;
+  }
   const reader = new FileReader();
   reader.onload = async () => {
-    const lines = String(reader.result).split(/\r?\n/).filter(Boolean);
-    const [head, ...body] = lines;
-    const headers = head.split(',').map(x => x.trim());
-    for (const line of body) {
-      const cols = parseCsvLine(line);
-      const obj = Object.fromEntries(headers.map((h, i) => [h, cols[i]]));
-      const input = {
-        title: obj.title || 'Импортированный товар', marketplace: obj.marketplace || 'wildberries', category: obj.category || 'custom',
-        price: +obj.price || 0, cost: +obj.cost || 0, packaging: +obj.packaging || 0, logistics: +obj.logistics || 0,
-        storage: +obj.storage || 0, returnLogistics: +obj.returnLogistics || 0, commission: +obj.commission || 15,
-        acquiring: +obj.acquiring || 2, ads: +obj.ads || 8, returns: +obj.returns || 5, taxMode: obj.taxMode || 'usn6', salesPerMonth: +obj.salesPerMonth || 0
-      };
-      const r = calculate(input);
-      const payload = { id: crypto.randomUUID(), created_at: new Date().toISOString(), title: r.title, marketplace: r.marketplace, category: r.category, price: r.price, cost: r.cost, packaging: r.packaging, logistics: r.logistics, storage: r.storage, return_logistics: r.returnLogistics, commission_pct: r.commission, acquiring_pct: r.acquiring, ads_pct: r.ads, returns_pct: r.returns, tax_mode: r.taxMode, sales_per_month: r.salesPerMonth, profit: r.profit, margin: r.margin, roi: r.roi, breakeven_price: r.breakeven, status: r.status, raw: r };
-      products.unshift(payload);
-    }
-    localStorage.setItem('SM_PRODUCTS', JSON.stringify(products));
-    toast('CSV импортирован локально. Для массового импорта в Supabase используйте SQL/API.');
-    renderProducts();
+    try {
+      const lines = String(reader.result).split(/\r?\n/).filter(Boolean);
+      if (lines.length < 2) return toast('CSV пустой или содержит только заголовок');
+      const [head, ...body] = lines;
+      const headers = head.split(',').map(x => x.trim());
+      const rows = [];
+      for (const line of body) {
+        const cols = parseCsvLine(line);
+        const obj = Object.fromEntries(headers.map((h, i) => [h, cols[i]]));
+        const input = {
+          title: obj.title || obj.name || 'Импортированный товар', marketplace: obj.marketplace || 'wildberries', category: obj.category || 'custom',
+          price: +obj.price || 0, cost: +obj.cost || 0, packaging: +obj.packaging || 0, logistics: +obj.logistics || 0,
+          storage: +obj.storage || 0, returnLogistics: +obj.returnLogistics || +obj.return_logistics || 0, commission: +obj.commission || +obj.commission_pct || 15,
+          acquiring: +obj.acquiring || +obj.acquiring_pct || 2, ads: +obj.ads || +obj.ads_pct || 8, returns: +obj.returns || +obj.returns_pct || 5, taxMode: obj.taxMode || obj.tax_mode || 'usn6', salesPerMonth: +obj.salesPerMonth || +obj.sales_per_month || 0
+        };
+        const r = calculate(input);
+        rows.push({ title: r.title, marketplace: r.marketplace, category: r.category, price: r.price, cost: r.cost, packaging: r.packaging, logistics: r.logistics, storage: r.storage, return_logistics: r.returnLogistics, commission_pct: r.commission, acquiring_pct: r.acquiring, ads_pct: r.ads, returns_pct: r.returns, tax_mode: r.taxMode, sales_per_month: r.salesPerMonth, profit: r.profit, margin: r.margin, roi: r.roi, breakeven_price: r.breakeven, status: r.status, raw: r });
+      }
+      const { error } = await supabaseClient.from('products').insert(rows);
+      if (error) throw error;
+      toast(`Импортировано товаров: ${rows.length}`);
+      await loadProducts();
+    } catch (e) { toast(e.message || 'Ошибка импорта CSV'); }
   };
   reader.readAsText(file);
 }
@@ -357,15 +365,31 @@ function parseCsvLine(line) {
   for (let i=0;i<line.length;i++){const ch=line[i]; if(ch==='"'){q=!q; continue;} if(ch===','&&!q){res.push(cur);cur='';} else cur+=ch;} res.push(cur); return res;
 }
 
+
+async function linkTelegram() {
+  if (!supabaseClient || !currentUser) {
+    toast('Сначала войдите в аккаунт, затем привяжите Telegram.');
+    $('#authModal')?.showModal();
+    return;
+  }
+  try {
+    const token = (await supabaseClient.auth.getSession()).data?.session?.access_token;
+    const res = await fetch('/api/link-telegram', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Не удалось создать ссылку');
+    window.open(data.url, '_blank');
+  } catch (e) { toast(e.message || 'Ошибка привязки Telegram'); }
+}
+
 function bindEvents() {
   $('#year').textContent = new Date().getFullYear();
   $('#calcForm').addEventListener('submit', e => { e.preventDefault(); recalc(); });
   $$('#calcForm input, #calcForm select').forEach(el => el.addEventListener('input', recalc));
-  $('#marketplaceSelect').addEventListener('change', applyDefaults);
-  $('#categorySelect').addEventListener('change', applyDefaults);
+  $('#marketplaceSelect')?.addEventListener('change', applyDefaults);
+  $('#categorySelect')?.addEventListener('change', applyDefaults);
   $('#saveProductBtn').onclick = saveProduct;
   $('#resetCalcBtn').onclick = () => { $('#calcForm').reset(); applyDefaults(); };
-  $('#demoFillBtn').onclick = () => { $('#calcForm').title.value = 'Наушники wireless'; $('#calcForm').price.value = 990; $('#calcForm').cost.value = 540; $('#calcForm').packaging.value = 45; $('#calcForm').logistics.value = 160; $('#calcForm').commission.value = 15; $('#calcForm').ads.value = 14; $('#calcForm').returns.value = 9; recalc(); location.hash = '#calculator'; };
+  $('#openAuthHeroBtn')?.addEventListener('click', () => currentUser ? location.hash = '#dashboard' : $('#authModal').showModal());
   $('#scenarioBtn').onclick = runScenario;
   $('#productSearch').addEventListener('input', renderProducts);
   $('#productFilter').addEventListener('change', renderProducts);
@@ -378,13 +402,13 @@ function bindEvents() {
   $('#authForm').addEventListener('submit', e => { e.preventDefault(); const fd = new FormData(e.target); signIn(fd.get('email'), fd.get('password')); });
   $('#signupBtn').onclick = () => { const fd = new FormData($('#authForm')); signUp(fd.get('email'), fd.get('password')); };
   $('#magicBtn').onclick = () => { const email = new FormData($('#authForm')).get('email'); email ? magicLink(email) : toast('Введите email'); };
-  $('#telegramLinkBtn').onclick = () => window.open(CONFIG.telegramUrl || 'https://t.me/SellerMoney_Pro_bot', '_blank');
+  $('#telegramLinkBtn').onclick = linkTelegram;
 }
 
 async function boot() {
   bindEvents(); initSupabase(); recalc(); await loadSession(); await loadProducts();
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(() => {});
-  if (new URLSearchParams(location.search).get('payment') === 'success') toast('Платёж получен или проверяется. Доступ активируется после webhook/ручного подтверждения.');
+  if (new URLSearchParams(location.search).get('payment') === 'success') toast('Платёж получен или проверяется. Доступ активируется после подтверждения оплаты.');
 }
 
 document.addEventListener('DOMContentLoaded', boot);

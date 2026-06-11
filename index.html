@@ -19,9 +19,9 @@
       supportVk: 'https://vk.com/bread1996',
       telegramBot: 'SellerMoney_Pro_bot',
       telegramUrl: 'https://t.me/SellerMoney_Pro_bot',
-      supabaseUrl: '',
-      supabaseAnonKey: '',
-      publicBaseUrl: ''
+      supabaseUrl: 'https://hulwoicinxwnighvexex.supabase.co',
+      supabaseAnonKey: 'sb_publishable_nZ0iaxmDVPmglkrvNWxejA_FIiHi8Lp',
+      publicBaseUrl: 'https://sellermoney-pro.pages.dev'
     };
   </script>
   <script src="/config.js"></script>
@@ -54,7 +54,7 @@
         <p class="lead">SellerMoney Pro показывает, какие товары реально зарабатывают, где начинается минус и сколько можно тратить на рекламу до точки безубыточности.</p>
         <div class="hero-actions">
           <a class="primary-btn" href="#calculator">Рассчитать товар бесплатно</a>
-          <button class="ghost-btn" id="demoFillBtn">Заполнить демо</button>
+          <button class="ghost-btn" id="openAuthHeroBtn">Создать аккаунт</button>
         </div>
         <div class="trust-row">
           <div><strong>3 мин</strong><span>до первого расчёта</span></div>
@@ -65,23 +65,23 @@
       <div class="hero-panel card-glow">
         <div class="terminal-head"><span></span><span></span><span></span><b>LIVE PROFIT CHECK</b></div>
         <div class="profit-card status-good">
-          <span>Футболка oversize</span>
+          <span>SKU с запасом маржи</span>
           <strong>+327 ₽</strong>
-          <em>маржа 21.9% · ROI 62.8%</em>
+          <em>маржа выше безопасного уровня</em>
         </div>
         <div class="profit-card status-warn">
-          <span>Чехол iPhone</span>
+          <span>SKU почти в нуле</span>
           <strong>+12 ₽</strong>
-          <em>товар почти в нуле</em>
+          <em>требуется пересчёт цены</em>
         </div>
         <div class="profit-card status-bad">
-          <span>Наушники wireless</span>
+          <span>SKU в минусе</span>
           <strong>-74 ₽</strong>
-          <em>реклама выше 6% убивает товар</em>
+          <em>реклама выводит позицию в убыток</em>
         </div>
         <div class="radar">
           <div class="radar-line"></div>
-          <p>AI-рекомендация: подними цену до 1 080 ₽ или отключи участие в акции.</p>
+          <p>Рекомендация: зафиксируйте минимальную цену и лимит рекламного расхода до запуска акции.</p>
         </div>
       </div>
     </section>
@@ -110,7 +110,7 @@
         <form class="calc-form glass" id="calcForm">
           <div class="form-row full">
             <label>Название товара
-              <input name="title" value="Футболка oversize" placeholder="Например: Футболка oversize" required />
+              <input name="title" value="" placeholder="Введите название товара или SKU" required />
             </label>
           </div>
           <div class="form-row">
@@ -132,24 +132,24 @@
             </label>
           </div>
           <div class="form-row">
-            <label>Цена продажи, ₽<input name="price" type="number" min="1" step="1" value="1490" required /></label>
-            <label>Себестоимость, ₽<input name="cost" type="number" min="0" step="1" value="520" required /></label>
+            <label>Цена продажи, ₽<input name="price" type="number" min="1" step="1" value="" required /></label>
+            <label>Себестоимость, ₽<input name="cost" type="number" min="0" step="1" value="" required /></label>
           </div>
           <div class="form-row">
-            <label>Упаковка, ₽<input name="packaging" type="number" min="0" step="1" value="35" /></label>
-            <label>Логистика, ₽<input name="logistics" type="number" min="0" step="1" value="110" /></label>
+            <label>Упаковка, ₽<input name="packaging" type="number" min="0" step="1" value="" /></label>
+            <label>Логистика, ₽<input name="logistics" type="number" min="0" step="1" value="" /></label>
           </div>
           <div class="form-row">
-            <label>Хранение/прочее, ₽<input name="storage" type="number" min="0" step="1" value="18" /></label>
-            <label>Возвратная логистика, ₽<input name="returnLogistics" type="number" min="0" step="1" value="90" /></label>
+            <label>Хранение/прочее, ₽<input name="storage" type="number" min="0" step="1" value="" /></label>
+            <label>Возвратная логистика, ₽<input name="returnLogistics" type="number" min="0" step="1" value="" /></label>
           </div>
           <div class="form-row three">
-            <label>Комиссия, %<input name="commission" type="number" min="0" max="80" step="0.1" value="18" /></label>
-            <label>Эквайринг, %<input name="acquiring" type="number" min="0" max="15" step="0.1" value="2" /></label>
-            <label>Реклама, %<input name="ads" type="number" min="0" max="80" step="0.1" value="10" /></label>
+            <label>Комиссия, %<input name="commission" type="number" min="0" max="80" step="0.1" value="" /></label>
+            <label>Эквайринг, %<input name="acquiring" type="number" min="0" max="15" step="0.1" value="" /></label>
+            <label>Реклама, %<input name="ads" type="number" min="0" max="80" step="0.1" value="" /></label>
           </div>
           <div class="form-row three">
-            <label>Возвраты, %<input name="returns" type="number" min="0" max="90" step="0.1" value="7" /></label>
+            <label>Возвраты, %<input name="returns" type="number" min="0" max="90" step="0.1" value="" /></label>
             <label>Налог
               <select name="taxMode">
                 <option value="usn6">УСН 6% с дохода</option>
@@ -157,7 +157,7 @@
                 <option value="none">Не учитывать</option>
               </select>
             </label>
-            <label>Продаж/мес.<input name="salesPerMonth" type="number" min="0" step="1" value="350" /></label>
+            <label>Продаж/мес.<input name="salesPerMonth" type="number" min="0" step="1" value="" /></label>
           </div>
           <div class="form-actions">
             <button type="submit" class="primary-btn">Рассчитать</button>
@@ -167,21 +167,21 @@
         </form>
 
         <aside class="result-panel glass" id="resultPanel">
-          <div class="result-status" id="resultStatus">прибыльный</div>
-          <h3 id="resultTitle">Футболка oversize</h3>
-          <div class="big-profit" id="profitValue">+327 ₽</div>
+          <div class="result-status" id="resultStatus">ожидает расчёт</div>
+          <h3 id="resultTitle">Введите данные товара</h3>
+          <div class="big-profit" id="profitValue">0 ₽</div>
           <div class="metric-grid">
-            <div><span>Маржа</span><b id="marginValue">21.9%</b></div>
-            <div><span>ROI</span><b id="roiValue">62.8%</b></div>
-            <div><span>Точка безубыточности</span><b id="breakevenValue">1 163 ₽</b></div>
-            <div><span>Потенциал/мес.</span><b id="monthlyValue">114 450 ₽</b></div>
+            <div><span>Маржа</span><b id="marginValue">0.0%</b></div>
+            <div><span>ROI</span><b id="roiValue">0.0%</b></div>
+            <div><span>Точка безубыточности</span><b id="breakevenValue">0 ₽</b></div>
+            <div><span>Потенциал/мес.</span><b id="monthlyValue">0 ₽</b></div>
           </div>
           <div class="danger-zone">
             <span>Безопасная реклама</span>
             <div class="progress"><i id="adsBar"></i></div>
-            <b id="maxAdsValue">до 31.9%</b>
+            <b id="maxAdsValue">до 0.0%</b>
           </div>
-          <div class="recommendation" id="recommendationBox">Цена нормальная. Но скидку ниже точки безубыточности ставить нельзя.</div>
+          <div class="recommendation" id="recommendationBox">Заполните поля калькулятора, чтобы увидеть чистую прибыль, точку безубыточности и рекомендации по цене.</div>
         </aside>
       </div>
     </section>
@@ -204,7 +204,7 @@
       <div class="section-title compact">
         <span class="eyebrow">кабинет</span>
         <h2>Портфель товаров</h2>
-        <p>После подключения Supabase товары сохраняются в базе пользователя. До подключения работает локальный демо-режим.</p>
+        <p>Сохраняйте расчёты в личном кабинете, фильтруйте товары по риску и выгружайте портфель в CSV.</p>
       </div>
       <div class="dashboard-grid">
         <div class="stat-card"><span>Товаров</span><b id="statTotal">0</b></div>
@@ -229,9 +229,9 @@
 
     <section class="pricing-section section" id="pricing">
       <div class="section-title compact">
-        <span class="eyebrow">монетизация</span>
-        <h2>Тарифы, которые легко купить</h2>
-        <p>Первый чек должен быть низким, а ценность — денежной. Поэтому лимитируем не расчёт, а сохранение и анализ портфеля.</p>
+        <span class="eyebrow">подписка</span>
+        <h2>Тарифы для селлеров</h2>
+        <p>Начните с бесплатного расчёта и подключайте расширенные лимиты, когда нужен контроль всего товарного портфеля.</p>
       </div>
       <div class="pricing-grid">
         <article class="price-card">
@@ -262,7 +262,7 @@
       <div>
         <span class="eyebrow">поддержка</span>
         <h2>Нужен быстрый разбор товара?</h2>
-        <p>Пишите в Telegram-бот или VK. На старте можно продавать ручной аудит 10 товаров за 990 ₽ и переводить в подписку.</p>
+        <p>Поддержка помогает с расчётом, оплатой и переносом товаров в кабинет.</p>
       </div>
       <div class="contact-actions">
         <a class="primary-btn" href="https://t.me/SellerMoney_Pro_bot" target="_blank" rel="noreferrer">Открыть Telegram-бота</a>
@@ -278,8 +278,8 @@
       </div>
       <details open><summary>Это замена аналитике маркетплейса?</summary><p>Нет. Это быстрый финансовый слой: вы вводите ключевые расходы и видите чистую прибыль, риски и точку безубыточности.</p></details>
       <details><summary>Нужна ли интеграция с WB/Ozon?</summary><p>Для первой коммерческой версии нет. Ручной ввод и CSV-импорт позволяют запустить продажи быстрее. API-интеграции можно добавить после первых оплат.</p></details>
-      <details><summary>Как подключаются оплаты?</summary><p>Код поддерживает YooMoney-форму, YooMoney webhook и опционально ЮKassa API. Секреты добавляются в Cloudflare Pages Variables.</p></details>
-      <details><summary>Почему Supabase?</summary><p>Он даёт Postgres, Auth, RLS-политики и быстрый запуск без собственного сервера.</p></details>
+      <details><summary>Как подключаются оплаты?</summary><p>Оплата проходит через подключённый платёжный провайдер. После оплаты доступ активируется автоматически или через поддержку.</p></details>
+      <details><summary>Почему Supabase?</summary><p>Данные хранятся в защищённой базе, а доступ к товарам привязан к аккаунту пользователя.</p></details>
     </section>
   </main>
 
@@ -290,14 +290,14 @@
       <a href="/legal/terms.html">Пользовательское соглашение</a>
       <a href="/admin.html">Админка</a>
     </div>
-    <p>© <span id="year"></span> SellerMoney Pro. Демо-расчёты не являются финансовой консультацией.</p>
+    <p>© <span id="year"></span> SellerMoney Pro. Расчёты носят информационный характер и зависят от введённых данных.</p>
   </footer>
 
   <dialog class="auth-modal" id="authModal">
     <button class="close" id="closeAuthBtn">×</button>
     <div class="modal-logo"><img src="/assets/logo.svg" alt="SellerMoney Pro" /></div>
     <h2>Вход в кабинет</h2>
-    <p>Подключите Supabase — и форма начнёт создавать реальные аккаунты. До этого работает демо-режим.</p>
+    <p>Войдите в кабинет или создайте аккаунт, чтобы сохранять товары, импортировать CSV и управлять подпиской.</p>
     <form id="authForm" class="auth-form">
       <input name="email" type="email" placeholder="Email" required value="" />
       <input name="password" type="password" placeholder="Пароль" minlength="6" required />
@@ -306,7 +306,7 @@
         <button type="button" class="ghost-btn" id="signupBtn">Создать аккаунт</button>
       </div>
       <button type="button" class="link-btn" id="magicBtn">Войти по email-ссылке</button>
-      <button type="button" class="link-btn" id="telegramLinkBtn">Привязать Telegram через бота</button>
+      <button type="button" class="link-btn" id="telegramLinkBtn">Привязать Telegram к аккаунту</button>
     </form>
     <div class="auth-note" id="authNote"></div>
   </dialog>
