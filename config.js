@@ -6,7 +6,7 @@ window.SELLERMONEY_CONFIG = {
   supportVk: 'https://vk.com/bread1996',
   telegramBot: 'SellerMoney_Pro_bot',
   telegramUrl: 'https://t.me/SellerMoney_Pro_bot',
-  supabaseUrl: '',
-  supabaseAnonKey: '',
-  publicBaseUrl: ''
+  supabaseUrl: 'https://hulwoicinxwnighvexex.supabase.co',
+  supabaseAnonKey: 'sb_publishable_nZ0iaxmDVPmglkrvNWxejA_FIiHi8Lp',
+  publicBaseUrl: 'https://sellermoney-pro.pages.dev/',
 };
